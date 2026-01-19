@@ -10,7 +10,7 @@
     <div class="page">
       <header>
         <h1>Darts Elo Tracker</h1>
-        <p>Track player ratings, scores, and averages with a simple Elo system.</p>
+        <p>Track player ratings and results with a simple Elo system.</p>
       </header>
 
       <main>
@@ -23,16 +23,27 @@
                 <input type="text" name="playerName" placeholder="Jane" required />
               </label>
               <label>
-                Player Score
-                <input type="number" name="playerScore" min="0" step="1" placeholder="501" required />
+                Winner
+                <select name="winner" required>
+                  <option value="" selected disabled>Select winner</option>
+                  <option value="player">Player</option>
+                  <option value="opponent">Opponent</option>
+                </select>
               </label>
               <label>
                 Opponent Name
                 <input type="text" name="opponentName" placeholder="Alex" required />
               </label>
               <label>
-                Opponent Score
-                <input type="number" name="opponentScore" min="0" step="1" placeholder="450" required />
+                Winner Checkout
+                <input
+                  type="number"
+                  name="winnerCheckout"
+                  min="0"
+                  step="1"
+                  placeholder="120"
+                  required
+                />
               </label>
             </div>
             <div class="actions">
@@ -51,7 +62,7 @@
               <span>Player</span>
               <span>Elo</span>
               <span>Games</span>
-              <span>Avg Score</span>
+              <span>Highest Checkout</span>
             </div>
             <div class="row empty">No matches yet. Add the first one above.</div>
           </div>
