@@ -8,10 +8,13 @@ const leaderboard = document.getElementById("leaderboard");
 const message = document.getElementById("form-message");
 const resetButton = document.getElementById("reset-data");
 const recentMatches = document.getElementById("recent-matches");
+const playerDetails = document.getElementById("player-details");
 
 const state = loadState();
+let selectedPlayerKey = null;
 renderLeaderboard();
 renderMatches();
+renderPlayerDetails();
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -53,8 +56,8 @@ form.addEventListener("submit", (event) => {
   player.rating = updateRating(player.rating, result, expectedPlayer);
   opponent.rating = updateRating(opponent.rating, opponentResult, expectedOpponent);
 
-  updateStats(player);
-  updateStats(opponent);
+  updateStats(player, result === 1);
+  updateStats(opponent, result === 0);
   updateHighestCheckout(result === 1 ? player : opponent, winnerCheckout);
   recordMatch({
     player: player.displayName,
@@ -66,6 +69,7 @@ form.addEventListener("submit", (event) => {
 
   saveState();
   renderLeaderboard();
+  renderPlayerDetails();
   renderMatches();
   form.reset();
   setMessage(
@@ -87,8 +91,10 @@ resetButton.addEventListener("click", () => {
   state.players = {};
   state.matches = [];
   state.previousRanks = {};
+  selectedPlayerKey = null;
   saveState();
   renderLeaderboard();
+  renderPlayerDetails();
   renderMatches();
   setMessage("All data cleared.");
 });
@@ -109,11 +115,15 @@ function getPlayer(nameInfo) {
       rating: DEFAULT_RATING,
       games: 0,
       highestCheckout: 0,
+      wins: 0,
+      losses: 0,
     };
   } else if (nameInfo.displayName) {
     state.players[nameInfo.key].displayName = nameInfo.displayName;
     state.players[nameInfo.key].highestCheckout =
       state.players[nameInfo.key].highestCheckout ?? 0;
+    state.players[nameInfo.key].wins = state.players[nameInfo.key].wins ?? 0;
+    state.players[nameInfo.key].losses = state.players[nameInfo.key].losses ?? 0;
     state.players[nameInfo.key].key = nameInfo.key;
   }
   return state.players[nameInfo.key];
@@ -127,8 +137,13 @@ function updateRating(rating, result, expected) {
   return Math.round(rating + K_FACTOR * (result - expected));
 }
 
-function updateStats(player) {
+function updateStats(player, didWin) {
   player.games += 1;
+  if (didWin) {
+    player.wins += 1;
+  } else {
+    player.losses += 1;
+  }
 }
 
 function updateHighestCheckout(player, checkout) {
@@ -177,22 +192,73 @@ function renderLeaderboard() {
     nextRanks[playerKey] = rank;
 
     const row = document.createElement("div");
-    row.className = "row";
+    row.className = `row${playerKey === selectedPlayerKey ? " selected" : ""}`;
     row.innerHTML = `
         <span class="rank-cell">
           <span>${rank}</span>
           <span class="rank-change ${movementClass}">${movementLabel}</span>
         </span>
-        <span>${player.displayName}</span>
+        <span>
+          <button class="player-button" type="button" data-player-key="${playerKey}">
+            ${player.displayName}
+          </button>
+        </span>
         <span>${player.rating}</span>
         <span>${player.games}</span>
         <span>${player.highestCheckout}</span>
       `;
+    row.querySelector(".player-button").addEventListener("click", () => {
+      selectedPlayerKey = playerKey;
+      renderLeaderboard();
+      renderPlayerDetails();
+    });
     leaderboard.appendChild(row);
   });
 
   state.previousRanks = nextRanks;
   saveState();
+}
+
+function renderPlayerDetails() {
+  if (!playerDetails) {
+    return;
+  }
+
+  const player = selectedPlayerKey ? state.players[selectedPlayerKey] : null;
+
+  if (!player) {
+    playerDetails.innerHTML = `
+      <p class="empty-detail">Select a player from the leaderboard to view stats.</p>
+    `;
+    return;
+  }
+
+  playerDetails.innerHTML = `
+    <div class="player-summary">
+      <div>
+        <h3>${player.displayName}</h3>
+        <p class="detail-meta">Elo ${player.rating}</p>
+      </div>
+      <div class="detail-highlight">
+        <span>Highest Checkout</span>
+        <strong>${player.highestCheckout}</strong>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div>
+        <span>Games Played</span>
+        <strong>${player.games}</strong>
+      </div>
+      <div>
+        <span>Wins</span>
+        <strong>${player.wins}</strong>
+      </div>
+      <div>
+        <span>Losses</span>
+        <strong>${player.losses}</strong>
+      </div>
+    </div>
+  `;
 }
 
 function renderMatches() {
@@ -242,6 +308,8 @@ function loadState() {
           key,
           {
             highestCheckout: 0,
+            wins: 0,
+            losses: 0,
             key,
             ...value,
           },
