@@ -15,8 +15,8 @@ form.addEventListener("submit", (event) => {
   const formData = new FormData(form);
   const playerName = normalizeName(formData.get("playerName"));
   const opponentName = normalizeName(formData.get("opponentName"));
-  const playerScore = Number(formData.get("playerScore"));
-  const opponentScore = Number(formData.get("opponentScore"));
+  const winner = formData.get("winner");
+  const winnerCheckout = Number(formData.get("winnerCheckout"));
 
   if (!playerName || !opponentName) {
     setMessage("Both player names are required.");
@@ -28,12 +28,17 @@ form.addEventListener("submit", (event) => {
     return;
   }
 
-  if (Number.isNaN(playerScore) || Number.isNaN(opponentScore)) {
-    setMessage("Scores must be valid numbers.");
+  if (!winner || (winner !== "player" && winner !== "opponent")) {
+    setMessage("Please select a winner.");
     return;
   }
 
-  const result = playerScore === opponentScore ? 0.5 : playerScore > opponentScore ? 1 : 0;
+  if (Number.isNaN(winnerCheckout) || winnerCheckout < 0) {
+    setMessage("Winner checkout must be a valid number.");
+    return;
+  }
+
+  const result = winner === "player" ? 1 : 0;
   const opponentResult = 1 - result;
 
   const player = getPlayer(playerName);
@@ -45,14 +50,17 @@ form.addEventListener("submit", (event) => {
   player.rating = updateRating(player.rating, result, expectedPlayer);
   opponent.rating = updateRating(opponent.rating, opponentResult, expectedOpponent);
 
-  updateStats(player, playerScore);
-  updateStats(opponent, opponentScore);
+  updateStats(player);
+  updateStats(opponent);
+  updateHighestCheckout(result === 1 ? player : opponent, winnerCheckout);
 
   saveState();
   renderLeaderboard();
   form.reset();
   setMessage(
-    `${player.displayName} (${playerScore}) vs ${opponent.displayName} (${opponentScore}) recorded.`
+    `${winner === "player" ? player.displayName : opponent.displayName} defeated ${
+      winner === "player" ? opponent.displayName : player.displayName
+    } (checkout ${winnerCheckout}).`
   );
 });
 
@@ -80,10 +88,12 @@ function getPlayer(nameInfo) {
       displayName: nameInfo.displayName,
       rating: DEFAULT_RATING,
       games: 0,
-      totalScore: 0,
+      highestCheckout: 0,
     };
   } else if (nameInfo.displayName) {
     state.players[nameInfo.key].displayName = nameInfo.displayName;
+    state.players[nameInfo.key].highestCheckout =
+      state.players[nameInfo.key].highestCheckout ?? 0;
   }
   return state.players[nameInfo.key];
 }
@@ -96,9 +106,14 @@ function updateRating(rating, result, expected) {
   return Math.round(rating + K_FACTOR * (result - expected));
 }
 
-function updateStats(player, score) {
+function updateStats(player) {
   player.games += 1;
-  player.totalScore += score;
+}
+
+function updateHighestCheckout(player, checkout) {
+  if (checkout > player.highestCheckout) {
+    player.highestCheckout = checkout;
+  }
 }
 
 function renderLeaderboard() {
@@ -109,7 +124,7 @@ function renderLeaderboard() {
       <span>Player</span>
       <span>Elo</span>
       <span>Games</span>
-      <span>Avg Score</span>
+      <span>Highest Checkout</span>
     </div>
   `;
 
@@ -126,13 +141,12 @@ function renderLeaderboard() {
     .forEach((player, index) => {
       const row = document.createElement("div");
       row.className = "row";
-      const average = player.games ? (player.totalScore / player.games).toFixed(1) : "0.0";
       row.innerHTML = `
         <span>${index + 1}</span>
         <span>${player.displayName}</span>
         <span>${player.rating}</span>
         <span>${player.games}</span>
-        <span>${average}</span>
+        <span>${player.highestCheckout}</span>
       `;
       leaderboard.appendChild(row);
     });
@@ -150,7 +164,15 @@ function loadState() {
   try {
     const parsed = JSON.parse(stored);
     return {
-      players: parsed.players || {},
+      players: Object.fromEntries(
+        Object.entries(parsed.players || {}).map(([key, value]) => [
+          key,
+          {
+            highestCheckout: 0,
+            ...value,
+          },
+        ])
+      ),
     };
   } catch (error) {
     return { players: {} };
