@@ -118,7 +118,7 @@ button:hover {
 
 .row {
   display: grid;
-  grid-template-columns: 80px 1.2fr repeat(3, 1fr);
+  grid-template-columns: 110px 1.2fr repeat(3, 1fr);
   align-items: center;
   gap: 12px;
   padding: 12px 10px;
@@ -141,6 +141,73 @@ button:hover {
   color: var(--muted);
 }
 
+.rank-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.rank-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f0f4ff;
+  color: #2a4fff;
+}
+
+.rank-change.down {
+  background: #fff1f0;
+  color: #d61f1f;
+}
+
+.rank-change.same {
+  background: #f3f4f6;
+  color: var(--muted);
+}
+
+.matches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.matches li {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: #f9fafc;
+}
+
+.matches li.empty {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+}
+
+.match-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.match-players {
+  font-weight: 700;
+}
+
+.match-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 footer {
   margin-top: 30px;
   text-align: center;
@@ -158,5 +225,10 @@ footer {
   .row span:nth-child(5) {
     grid-column: span 2;
     color: var(--muted);
+  }
+
+  .match-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
