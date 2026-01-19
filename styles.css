@@ -106,6 +106,21 @@ button:hover {
   opacity: 0.9;
 }
 
+.player-button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.player-button:hover,
+.player-button:focus-visible {
+  text-decoration: underline;
+}
+
 .helper {
   margin-top: 16px;
   color: var(--muted);
@@ -134,6 +149,11 @@ button:hover {
 
 .row:nth-child(even):not(.header) {
   background: #f9fafc;
+}
+
+.row.selected {
+  background: #eef2ff;
+  border: 1px solid #d6ddff;
 }
 
 .row.empty {
@@ -206,6 +226,78 @@ button:hover {
 .match-meta {
   color: var(--muted);
   font-size: 13px;
+}
+
+.player-details {
+  display: grid;
+  gap: 16px;
+}
+
+.player-details .empty-detail {
+  margin: 0;
+  color: var(--muted);
+}
+
+.player-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.player-summary h3 {
+  margin: 0;
+}
+
+.detail-meta {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.detail-highlight {
+  background: #f5f7ff;
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: grid;
+  gap: 4px;
+  text-align: right;
+}
+
+.detail-highlight span {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-highlight strong {
+  font-size: 20px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.detail-grid div {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.detail-grid span {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-grid strong {
+  font-size: 18px;
 }
 
 footer {
