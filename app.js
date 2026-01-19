@@ -1,6 +1,7 @@
 const STORAGE_KEY = "darts-elo-data";
 const DEFAULT_RATING = 1000;
 const K_FACTOR = 32;
+const RESET_PASSWORD = "6969";
 
 const form = document.getElementById("match-form");
 const leaderboard = document.getElementById("leaderboard");
@@ -76,6 +77,11 @@ form.addEventListener("submit", (event) => {
 
 resetButton.addEventListener("click", () => {
   if (!confirm("Reset all data? This cannot be undone.")) {
+    return;
+  }
+  const password = prompt("Enter the reset password to confirm.");
+  if (password !== RESET_PASSWORD) {
+    setMessage("Incorrect password. Data was not cleared.");
     return;
   }
   state.players = {};
