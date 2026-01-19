@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Darts Elo Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1>Darts Elo Tracker</h1>
+        <p>Track player ratings, scores, and averages with a simple Elo system.</p>
+      </header>
+
+      <main>
+        <section class="card">
+          <h2>Record a Match</h2>
+          <form id="match-form">
+            <div class="grid">
+              <label>
+                Player Name
+                <input type="text" name="playerName" placeholder="Jane" required />
+              </label>
+              <label>
+                Player Score
+                <input type="number" name="playerScore" min="0" step="1" placeholder="501" required />
+              </label>
+              <label>
+                Opponent Name
+                <input type="text" name="opponentName" placeholder="Alex" required />
+              </label>
+              <label>
+                Opponent Score
+                <input type="number" name="opponentScore" min="0" step="1" placeholder="450" required />
+              </label>
+            </div>
+            <div class="actions">
+              <button type="submit">Add Match</button>
+              <button type="button" id="reset-data" class="ghost">Reset Data</button>
+            </div>
+          </form>
+          <p class="helper" id="form-message" aria-live="polite"></p>
+        </section>
+
+        <section class="card">
+          <h2>Leaderboard</h2>
+          <div class="table" id="leaderboard">
+            <div class="row header">
+              <span>Rank</span>
+              <span>Player</span>
+              <span>Elo</span>
+              <span>Games</span>
+              <span>Avg Score</span>
+            </div>
+            <div class="row empty">No matches yet. Add the first one above.</div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <small>Ratings are stored locally in your browser.</small>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
